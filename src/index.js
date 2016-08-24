@@ -18,9 +18,13 @@ const FUNCTION_NAMES = [
     'defineMessages',
 ];
 
+const TEMPLATE_TAGS = [
+    'message',
+];
+
 const DESCRIPTOR_PROPS = new Set(['id', 'description', 'defaultMessage']);
 
-export default function () {
+export default function ({types: t}) {
     function getModuleSourceName(opts) {
         return opts.moduleSourceName || 'react-intl';
     }
@@ -268,6 +272,50 @@ export default function () {
                     messagesObj.get('properties')
                         .map((prop) => prop.get('value'))
                         .forEach(processMessageObject);
+                }
+            },
+
+            TaggedTemplateExpression(path, state) {
+                const moduleSourceName = getModuleSourceName(state.opts);
+                const tag = path.get('tag');
+
+                if (referencesImport(tag, moduleSourceName, TEMPLATE_TAGS)) {
+                    const templateLiteral = path.get('quasi');
+
+                    // Capture the values nodes.
+                    const values = templateLiteral.get('expressions')
+                        .map((expression) => expression.node);
+
+                    // Replace the expressions with value indexes so when the
+                    // message is evaluated to a string its arguments will map
+                    // to the captured `values`.
+                    templateLiteral.get('expressions').forEach((exp, i) => {
+                        exp.replaceWith(t.stringLiteral(`${i}`));
+                    });
+
+                    const message = getICUMessageValue(templateLiteral);
+                    const descriptor = {id: message, defaultMessage: message};
+
+                    storeMessage(descriptor, path, state);
+
+                    // Replace tagged template expression with an object literal
+                    // that contains the Message Descriptor and values.
+                    path.replaceWith(
+                        t.objectExpression([
+                            t.objectProperty(
+                                t.identifier('id'),
+                                t.stringLiteral(message)
+                            ),
+                            t.objectProperty(
+                                t.identifier('defaultMessage'),
+                                t.stringLiteral(message)
+                            ),
+                            t.objectProperty(
+                                t.identifier('values'),
+                                t.arrayExpression(values)
+                            ),
+                        ])
+                    );
                 }
             },
         },
