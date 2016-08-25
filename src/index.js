@@ -2,6 +2,7 @@
  * Copyright 2015, Yahoo Inc.
  * Copyrights licensed under the New BSD License.
  * See the accompanying LICENSE file for terms.
+ * Changed to support require and not only 'import'.
  */
 
 import * as p from 'path';
@@ -260,15 +261,34 @@ export default function () {
                     storeMessage(descriptor, path, state);
                 }
 
-                if (referencesImport(callee, moduleSourceName, FUNCTION_NAMES)) {
+				let extract = false;
+				if (referencesImport(callee, moduleSourceName, FUNCTION_NAMES)) {
+					extract = true;
+				}
+				if (callee.node.name === 'defineMessages') {
+					let binding = callee.scope.getBinding(callee.node.name);
+					if (binding) {
+						let declaration = binding.path.node
+
+						if (declaration.init.callee.name === 'require' &&
+							declaration.init.arguments[0].value === moduleSourceName &&
+							declaration.id &&
+							declaration.id.properties[0] &&
+							declaration.id.properties[0].value.name === 'defineMessages') {
+							extract = true;
+						}
+					}
+				}
+
+				if (extract) {
                     let messagesObj = path.get('arguments')[0];
 
                     assertObjectExpression(messagesObj);
 
-                    messagesObj.get('properties')
-                        .map((prop) => prop.get('value'))
-                        .forEach(processMessageObject);
-                }
+                    messagesObj.get('properties').map(function (prop) {
+                        return prop.get('value');
+                    }).forEach(processMessageObject);
+				}
             },
         },
     };

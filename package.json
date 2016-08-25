@@ -1,10 +1,10 @@
 {
   "name": "babel-plugin-react-intl",
-  "version": "2.1.4",
+  "version": "2.2.0",
   "description": "Extracts string messages for translation from modules that use React Intl.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yahoo/babel-plugin-react-intl.git"
+    "url": "git+https://github.com/hoschi/babel-plugin-react-intl.git"
   },
   "license": "BSD-3-Clause",
   "main": "lib/index.js",
@@ -42,7 +42,7 @@
     "react-intl"
   ],
   "bugs": {
-    "url": "https://github.com/yahoo/babel-plugin-react-intl/issues"
+    "url": "https://github.com/hoschi/babel-plugin-react-intl/issues"
   },
-  "homepage": "https://github.com/yahoo/babel-plugin-react-intl#readme"
+  "homepage": "https://github.com/hoschi/babel-plugin-react-intl#readme"
 }
