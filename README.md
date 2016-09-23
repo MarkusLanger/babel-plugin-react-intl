@@ -9,7 +9,7 @@ This fork enables you to require the react-intl package:
 
 ```js
 const { defineMessages } = require('react-intl')
-const {errorMessage} = defineMessages({
+const { errorMessage } = defineMessages({
     errorMessage:{
         id:'errorMessageId',
         defaultMessage:'An error occured!',
