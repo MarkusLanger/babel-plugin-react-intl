@@ -1,4 +1,4 @@
-# babel-plugin-react-intl
+# babel-plugin-react-intl-require
 
 Fork of [yahoo/babel-plugin-react-intl](https://github.com/yahoo/babel-plugin-react-intl ) which adds support for `require` React Intl instead of `import` it.
 
@@ -18,3 +18,11 @@ const { errorMessage } = defineMessages({
 })
 ```
 
+use in babel rc with "require" postfix
+```js
+plugins: [
+    ['react-intl-require', {
+      messagesDir: 'messages',
+    }]
+],
+```
